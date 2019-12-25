@@ -1,9 +1,13 @@
 package com.jojoldu.book.springboot.web;
 
+        import com.jojoldu.book.springboot.config.auth.SecurityConfig;
         import org.junit.Test;
         import org.junit.runner.RunWith;
         import org.springframework.beans.factory.annotation.Autowired;
         import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+        import org.springframework.context.annotation.ComponentScan;
+        import org.springframework.context.annotation.FilterType;
+        import org.springframework.security.test.context.support.WithMockUser;
         import org.springframework.test.context.junit4.SpringRunner;
         import org.springframework.test.web.servlet.MockMvc;
 
@@ -12,12 +16,15 @@ package com.jojoldu.book.springboot.web;
         import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)  // 1
-@WebMvcTest // 2
+@WebMvcTest(controllers = HelloController.class,excludeFilters = {
+        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class)
+}) // 2
 public class HelloControllerTest {
 
     @Autowired //3
     private MockMvc mvc;  //4
 
+    @WithMockUser(roles = "USER")
     @Test
     public void hello_return() throws  Exception {
         String hello = "hello";
@@ -25,7 +32,7 @@ public class HelloControllerTest {
                 .andExpect(status().isOk()) //6
                 .andExpect(content().string(hello)); //7
     }
-
+    @WithMockUser(roles = "USER")
     @Test
     public void helloDto_return() throws  Exception{
         String name ="hello";
